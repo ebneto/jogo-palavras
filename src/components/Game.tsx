@@ -45,6 +45,7 @@ const Game: React.FC<GameProps> = ({ nome }) => {
   const [palavrasDisponiveis, setPalavrasDisponiveis] = useState<string[]>([]);
   const [mostrarInstrucoes, setMostrarInstrucoes] = useState(false);
   const [temporizadorAtivo, setTemporizadorAtivo] = useState(true);
+  const [feedbackCor, setFeedbackCor] = useState<'nenhum' | 'acerto' | 'erro'>('nenhum');
 
 
   // Função para salvar no backend (AWS API Gateway + Lambda + DynamoDB)
@@ -110,7 +111,7 @@ const Game: React.FC<GameProps> = ({ nome }) => {
         const palavras = texto
           .split('\n')                 // divide por linha
           .map(p => p.trim())          // remove espaços extras
-          .filter(p => p.length > 0);  // remove linhas vazias
+          .filter(p => p.length >= 3);  // remove linhas vazias
         setPalavrasDisponiveis(palavras);
         setLoading(false);
 
@@ -149,7 +150,6 @@ const Game: React.FC<GameProps> = ({ nome }) => {
     }
 
     setPalavraOriginal(novaPalavra);
-    setPalavraEmbaralhada(embaralhar(novaPalavra));
     setResposta('');
     setMensagem('');
     setDesativado(false);
@@ -178,6 +178,13 @@ const Game: React.FC<GameProps> = ({ nome }) => {
       carregarNovaPalavraInteligente();
     }
   }, [loading, palavrasDisponiveis]);
+
+
+  useEffect(() => {
+    if (palavraOriginal) {
+      setPalavraEmbaralhada(embaralhar(palavraOriginal));
+    }
+  }, [palavraOriginal]);
 
 
   // Reduz o tempo a cada segundo
@@ -224,10 +231,13 @@ const Game: React.FC<GameProps> = ({ nome }) => {
 
   // Verifica se a resposta do jogador está correta
   function verificarResposta() {
-    if (resposta.toLowerCase() === palavraOriginal.toLowerCase()) {
+    if (resposta.toLowerCase().trim() === palavraOriginal.toLowerCase()) {
       setMensagem('✅ Acertou!');
       setDesativado(true);
       setPontos(p => p + 1); // Incrementa a pontuação
+
+      setFeedbackCor('acerto'); // ✅ muda texto para verde
+      setTimeout(() => setFeedbackCor('nenhum'), 2000);
 
       // Atualiza contador
       setcontadorPalavrasTamanhoAtual(c => c + 1);
@@ -237,6 +247,8 @@ const Game: React.FC<GameProps> = ({ nome }) => {
       return true;
     } else {
       setMensagem('❌ Tente novamente!');
+      setFeedbackCor('erro'); // // ❌ muda texto para vermelho
+      setTimeout(() => setFeedbackCor('nenhum'), 2000);
       return false;
     }
   }
@@ -246,14 +258,16 @@ const Game: React.FC<GameProps> = ({ nome }) => {
         position: 'fixed',
         top: 0, left: 0,
         width: '100%', height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: '#1e1e1e', // fundo escuro
+        color: '#f0f0f0',           // texto claro
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1000
       }}>
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: '#1e1e1e', // fundo escuro
+          color: '#f0f0f0',           // texto claro
           padding: '2rem',
           borderRadius: '10px',
           maxWidth: '400px',
@@ -285,7 +299,7 @@ const Game: React.FC<GameProps> = ({ nome }) => {
 
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '1rem', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '1rem', textAlign: 'center', fontFamily: 'Arial, sans-serif', backgroundColor: '#3e4345', color: '#f0f0f0' }}>
       {/* MODAL DENTRO DO JSX */}
       {mostrarInstrucoes && (
         <div style={{
@@ -299,7 +313,8 @@ const Game: React.FC<GameProps> = ({ nome }) => {
           zIndex: 1000
         }}>
           <div style={{
-            backgroundColor: 'white',
+            backgroundColor: '#1e1e1e', // fundo escuro
+            color: '#f0f0f0',           // texto claro
             padding: '2rem',
             borderRadius: '10px',
             maxWidth: '400px',
@@ -353,12 +368,12 @@ const Game: React.FC<GameProps> = ({ nome }) => {
           </button>
 
           <div style={{ marginBottom: '1rem', fontSize: '1rem', fontWeight: 'bold' }}>
-            Jogador: {nome} | Pontos: {pontos}
+            Jogador: {nome} | Pontos: <span style={{ color: feedbackCor === 'acerto' ? 'limegreen' : 'white' }}>{pontos}</span>
           </div>
 
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Adivinhe a palavra!</h2>
 
-          <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
+          <div style={{ marginBottom: '1rem', fontSize: '1.2rem', backgroundColor: '#484D50', color: '#f0f0f0' }}>
             Tempo restante: {tempoRestante}s
           </div>
 
@@ -386,7 +401,7 @@ const Game: React.FC<GameProps> = ({ nome }) => {
             disabled={desativado}
             style={{
               padding: '0.5rem',
-              width: '100%',
+              width: '95%',
               marginBottom: '0.75rem',
               fontSize: '1rem'
             }}
@@ -398,7 +413,10 @@ const Game: React.FC<GameProps> = ({ nome }) => {
               padding: '0.6rem',
               width: '100%',
               backgroundColor: desativado ? '#ccc' : '#007bff',
-              color: 'white',
+              color:
+                feedbackCor === 'acerto' ? 'limegreen' :
+                feedbackCor === 'erro' ? 'crimson' :
+                'white',
               border: 'none',
               borderRadius: '5px',
               marginBottom: '0.5rem',
