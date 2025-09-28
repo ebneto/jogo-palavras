@@ -1,69 +1,32 @@
 # React + TypeScript + Vite
+# 🚀 Jogo de Palavras Escalável (AWS Serverless)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Um projeto *full-stack* desenvolvido para demonstrar a proficiência na construção e deploy de aplicações escaláveis utilizando a arquitetura Serverless da AWS. O jogo consiste na reordenação de letras para formar palavras válidas, com foco na performance e baixo custo operacional.
 
-Currently, two official plugins are available:
+## 🎯 Objetivo do Projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1.  **Dominar o Serverless:** Provar a capacidade de configurar e orquestrar serviços Serverless (Lambda, DynamoDB) para criar uma API robusta.
+2.  **Desenvolvimento Full-Stack:** Aplicar boas práticas de desenvolvimento Frontend (React/TypeScript) e Backend (Node.js/Lambda).
+3.  **Escalabilidade e Custo:** Criar uma solução que escala automaticamente sem o custo fixo de servidores tradicionais.
 
-## Expanding the ESLint configuration
+## ⚙️ Tecnologias Utilizadas
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Categoria | Tecnologia | Uso |
+| :--- | :--- | :--- |
+| **Frontend** | React, TypeScript | Interface do usuário e lógica de reordenação de palavras. |
+| **Infraestrutura** | AWS Lambda | Execução do código backend sem servidor (lógica de validação e interação com DB). |
+| **Banco de Dados** | AWS DynamoDB (NoSQL) | Armazenamento das palavras, usuários e pontuação |
+| **Distribuição** | AWS S3, CloudFront (CDN) | Hospedagem estática do frontend e entrega de conteúdo de baixa latência. |
+| **API** | AWS API Gateway | Criação da interface de acesso à API Serverless. |
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🏗️ Arquitetura da Solução
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+O projeto segue o padrão Serverless, onde o React é servido via S3/CDN. O frontend interage com o **API Gateway**, que aciona as funções **AWS Lambda** para processar a requisição e interagir com o **DynamoDB**.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🔗 Links
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+* **Demo Online:** https://d1rxd63kvexn53.cloudfront.net/
+* **Visitar o Painel de Métricas:** 
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+***
+*Desenvolvido com 💛 por ebneto*
